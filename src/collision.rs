@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::schedule::GameSet;
+
 #[derive(Component)]
 pub struct RectangleCollider{
     //height of the rectangle, along the y-axis
@@ -19,23 +21,21 @@ impl CircleCollider{
     pub const fn new(radius: f32) -> CircleCollider {CircleCollider {radius}}
 }
 #[derive(Event)]
-struct CollisionEvent{
-    normal: Vec3,
+pub struct CollisionEvent{
+    pub normal: Vec3,
     pub a: Entity,
     pub b: Entity
 }
 impl CollisionEvent{
     pub fn new (normal: Vec3,a: Entity,b: Entity) -> Self {CollisionEvent{normal,a,b}}
-    pub fn get_a_normal(&self) -> Vec3{ self.normal}
-    pub fn get_b_normal(&self) -> Vec3{-self.normal}
 }
 
 pub struct CollisionPlugin;
 
 impl Plugin for CollisionPlugin{
     fn build(&self, app: &mut App) {
-        app.add_event::<CollisionEvent>()
-            .add_systems(Update, circle_rectangle_collision);
+        app .add_event::<CollisionEvent>()
+            .add_systems(PostUpdate, circle_rectangle_collision.in_set(GameSet::CollisionDetection));
     }
 }
 
@@ -77,6 +77,8 @@ fn circle_rectangle_collision(
             
             if let Some(normal) = normal{
                 event_writer.send(CollisionEvent::new(normal,rect,circle));
+                println!("{:?},{:?}",in_x_bounds,in_y_bounds);
+                println!("{:?} <= {:?} + {:?}  / 2.0 && {:?} >= rel_rect_pos.x - {:?}  / 2.0", rel_circle_pos.x, rel_rect_pos.x, rect_coll.width, rel_circle_pos.x, rect_coll.width)
             }
         }
     }

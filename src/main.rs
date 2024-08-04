@@ -1,14 +1,21 @@
-use bevy::{prelude::*, render::camera::CameraPlugin, window::WindowMode};
+use ball::BallPlugin;
+use bevy::{prelude::*, window::WindowMode};
+use camera::CameraPlugin;
 use collision::CollisionPlugin;
+use debug::DebugPlugin;
+use game::GamePlugin;
+use input::InputPlugin;
+use paddle::PaddlePlugin;
+use schedule::SchedulePlugin;
 
 mod game;
 mod debug;
+mod schedule;
 mod ball;
-mod movement;
 mod paddle;
 mod collision;
 mod camera;
-
+mod input;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin{
@@ -17,9 +24,14 @@ fn main() {
             ),
             ..default()
         }))
+        .add_plugins(GamePlugin)
         .add_plugins(CollisionPlugin)
         .add_plugins(CameraPlugin)
-        .add_plugins()
+        .add_plugins(DebugPlugin)
+        .add_plugins(PaddlePlugin)
+        .add_plugins(InputPlugin)
+        .add_plugins(BallPlugin)
+        .add_plugins(SchedulePlugin)
         .run();
 }
 

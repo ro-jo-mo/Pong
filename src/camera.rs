@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, render::camera::ScalingMode};
 
 pub struct CameraPlugin;
 impl Plugin for CameraPlugin{
@@ -8,10 +8,12 @@ impl Plugin for CameraPlugin{
 }
 
 fn spawn_camera(mut commands: Commands){
-    commands.spawn(Camera2dBundle{
+    let mut bundle = Camera2dBundle{
         transform: Transform::from_xyz(0.0, 0.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..default()
-    });
+    };
+    bundle.projection.scaling_mode = ScalingMode::Fixed { width: 1920.0, height: 1080.0 };
+    commands.spawn(bundle);
 }
 /*
     effects:

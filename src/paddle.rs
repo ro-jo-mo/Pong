@@ -1,9 +1,12 @@
 use bevy::{prelude::*, sprite::{MaterialMesh2dBundle, Mesh2dHandle}};
 
-use crate::{collision::{CircleCollider, RectangleCollider}, game::GameSize};
+use crate::{collision::{CircleCollider, RectangleCollider}, game::GameSize, schedule::GameSet};
 
-const PADDLE_HEIGHT: f32 = 100.0;
-const PADDLE_WIDTH: f32 = 50.0;
+const PADDLE_HEIGHT: f32 = 150.0;
+const PADDLE_WIDTH: f32 = 32.0;
+const ROTATION_SPEED: f32 = 2.5;
+const MOVE_SPEED: f32 = 400.0;
+
 
 #[derive(Component)]
 pub struct Paddle{
@@ -18,7 +21,7 @@ pub struct PaddlePlugin;
 impl Plugin for PaddlePlugin{
     fn build(&self, app: &mut App) {
         app .add_systems(PostStartup, spawn_paddles)
-            .add_systems(Update, move_paddle);
+            .add_systems(Update, move_paddle.in_set(GameSet::EntityUpdates));
     }
 }
 #[derive(Bundle)]
@@ -65,7 +68,7 @@ fn move_paddle(
     time: Res<Time>
 ){
     for (mut trans, paddle) in query.iter_mut(){
-        trans.translation += Vec3::Y * paddle.movement * time.delta_seconds();
-        trans.rotate_z(paddle.rotation * time.delta_seconds())
+        trans.translation += Vec3::Y * paddle.movement * time.delta_seconds() * MOVE_SPEED;
+        trans.rotate_z(paddle.rotation * time.delta_seconds() * ROTATION_SPEED);
     }
 }
